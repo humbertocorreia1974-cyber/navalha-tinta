@@ -1,0 +1,10 @@
+# Imagem base do sandbox: deps do template ja instaladas (node_modules pre-aquecido).
+# Build (na VPS):  cd builder-templates/nextjs-saas-starter && docker build -f Dockerfile.base -t jgnext-template-base .
+# O SandboxService parte desta imagem quando ela existe; `npm install` do app so baixa o que for diferente.
+FROM node:20-alpine
+RUN apk add --no-cache git openssl libc6-compat
+WORKDIR /app
+COPY package.json ./
+COPY prisma ./prisma/
+RUN --mount=type=cache,target=/root/.npm npm install --legacy-peer-deps \
+    && rm -rf package.json package-lock.json prisma

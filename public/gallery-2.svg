@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs><linearGradient id="g" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#171F30"/><stop offset="1" stop-color="#1659E9" stop-opacity="0.62"/></linearGradient>
+  <radialGradient id="r" cx="0.5" cy="0.38" r="0.55"><stop offset="0" stop-color="#1E3B8A" stop-opacity="0.45"/><stop offset="1" stop-color="#1E3B8A" stop-opacity="0"/></radialGradient></defs>
+  <rect width="800" height="1000" fill="url(#g)"/><rect width="800" height="1000" fill="url(#r)"/>
+  <circle cx="650" cy="250" r="90" fill="none" stroke="#F8FAFC" stroke-opacity="0.22" stroke-width="2"/><circle cx="650" cy="250" r="175" fill="none" stroke="#F8FAFC" stroke-opacity="0.19" stroke-width="2"/><circle cx="650" cy="250" r="260" fill="none" stroke="#F8FAFC" stroke-opacity="0.16" stroke-width="2"/><circle cx="650" cy="250" r="345" fill="none" stroke="#F8FAFC" stroke-opacity="0.13" stroke-width="2"/><circle cx="650" cy="250" r="430" fill="none" stroke="#F8FAFC" stroke-opacity="0.10" stroke-width="2"/><circle cx="650" cy="250" r="515" fill="none" stroke="#F8FAFC" stroke-opacity="0.07" stroke-width="2"/>
+  <g transform="translate(330 300) rotate(-9 150 150) scale(12.5)" fill="none" stroke="#F8FAFC" stroke-opacity="0.9" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.6 7.6 20 18M8.6 16.4 20 6"/></g>
+</svg>

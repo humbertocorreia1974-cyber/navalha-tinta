@@ -1,0 +1,466 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  termsAcceptedAt  DateTime?
+  id               String         @id @default(cuid())
+  name             String?
+  email            String         @unique
+  passwordHash     String
+  // 2026-11-10 (auditoria builder/design): apps com needsWhatsApp/needsTelegram
+  // geram codigo que faz user.phone / select phone:true sem o campo existir no
+  // schema (ex: lembrete de agendamento via WhatsApp) - 500 em runtime
+  // ("Unknown field 'phone'"). Campo opcional na fundacao resolve pra TODO app
+  // futuro, nao so o que tinha o bug.
+  phone            String?
+  plan             String         @default("free")
+  // 🩹 2026-09-01: apps com múltiplos papéis (jogador/dono, recepção/vet/admin…)
+  // faziam `prisma.user.findMany({ where: { role } })` e o build quebrava
+  // (TS2353: 'role' não existe em UserWhereInput). Agora a fundação tem o campo.
+  role             String         @default("user")
+  stripeCustomerId String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  projects         Project[]
+  barber           Barber?
+  appointments     Appointment[]  @relation("AppointmentClient")
+  subscriptions    Subscription[]
+  pauseRecords     PauseRecord[]
+  orders           Order[]
+  notifications    Notification[]
+  galleryItems     GalleryItem[]
+  auditLogs        AuditLog[]
+  addresss         Address[]
+  barberId         String?
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model Barber {
+  id     String  @id @default(cuid())
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  nomeCompleto    String
+  apelido         String?
+  emailContato    String
+  telefoneCelular String
+  fotoPerfil      String?
+  especialidades  String?
+  bio             String?
+  ativo           Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointments Appointment[]
+  galleryItems GalleryItem[]
+  blockedSlots BlockedSlot[]
+}
+
+model Service {
+  id                String  @id @default(cuid())
+  nomeServico       String
+  descricao         String?
+  duracaoMinutos    Int
+  precoBase         Decimal @db.Decimal(10, 2)
+  categoriaServico  String // corte | barba | combo | tratamento | outro
+  imagemIlustrativa String?
+  disponivel        Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointments      Appointment[]
+  subscriptionPlans SubscriptionPlan[]
+}
+
+model Appointment {
+  id                String   @id @default(cuid())
+  dataAgendamento   DateTime
+  horaInicio        String // "HH:mm"
+  horaFim           String // "HH:mm"
+  statusAgendamento String   @default("pendente") // pendente | confirmado | concluido | cancelado | no_show
+  nomeCliente       String
+  telefoneCliente   String
+  observacoes       String?
+  valorTotal        Decimal  @db.Decimal(10, 2)
+
+  clientId String?
+  client   User?   @relation("AppointmentClient", fields: [clientId], references: [id], onDelete: SetNull)
+
+  barberId String
+  barber   Barber @relation(fields: [barberId], references: [id], onDelete: Restrict)
+
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  couponId String?
+  coupon   Coupon? @relation(fields: [couponId], references: [id], onDelete: SetNull)
+
+  payment       Payment?       @relation(fields: [paymentId], references: [id])
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  paymentId String?  @unique
+
+  @@index([barberId, dataAgendamento])
+  @@index([clientId, dataAgendamento])
+  @@index([clientId])
+  @@index([barberId])
+  @@index([serviceId])
+  @@index([couponId])
+}
+
+model BlockedSlot {
+  id         String   @id @default(cuid())
+  barberId   String
+  barber     Barber   @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  data       DateTime
+  horaInicio String
+  horaFim    String
+  motivo     String?
+  createdAt  DateTime @default(now())
+
+  @@index([barberId, data])
+  @@index([barberId])
+}
+
+model SubscriptionPlan {
+  id                    String   @id @default(cuid())
+  nomePlano             String
+  descricao             String?
+  precoMensal           Decimal  @db.Decimal(10, 2)
+  quantidadeServicosMes Int
+  descontoProdutos      Decimal? @db.Decimal(5, 2)
+  destaque              Boolean  @default(false)
+  ativo                 Boolean  @default(true)
+  stripePriceId         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions Subscription[]
+  services      Service[]
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  nomeAssinante        String
+  emailAssinante       String
+  telefoneAssinante    String
+  dataInicio           DateTime
+  dataRenovacao        DateTime
+  statusAssinatura     String   @default("ativa") // ativa | pausada | cancelada | inadimplente
+  valorMensal          Decimal  @db.Decimal(10, 2)
+  stripeSubscriptionId String?  @unique
+  stripeCustomerId     String?
+  servicosUsadosMes    Int      @default(0)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  planId String
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  payments      Payment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  pauseRecords  PauseRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, statusAssinatura])
+  @@index([userId])
+  @@index([planId])
+}
+
+model PauseRecord {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dataInicio     DateTime
+  dataFim        DateTime?
+  motivo         String?
+  createdAt      DateTime     @default(now())
+
+  @@index([subscriptionId])
+  @@index([userId])
+}
+
+model Category {
+  id            String  @id @default(cuid())
+  nomeCategoria String
+  descricao     String?
+  slug          String  @unique
+  ordemExibicao Int     @default(0)
+  ativa         Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id                String  @id @default(cuid())
+  nomeProduto       String
+  descricao         String?
+  precoVenda        Decimal @db.Decimal(10, 2)
+  estoqueDisponivel Int     @default(0)
+  marca             String?
+  imagemPrincipal   String?
+  ativo             Boolean @default(true)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([categoryId])
+}
+
+model CartItem {
+  id             String  @id @default(cuid())
+  quantidade     Int
+  precoUnitario  Decimal @db.Decimal(10, 2)
+  subtotal       Decimal @db.Decimal(10, 2)
+  sessaoCarrinho String
+  observacao     String?
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([sessaoCarrinho])
+  @@index([productId])
+  @@index([orderId])
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  numeroPedido    String   @unique
+  nomeCliente     String
+  emailCliente    String
+  telefoneCliente String
+  dataPedido      DateTime @default(now())
+  statusPedido    String   @default("pendente") // pendente | pago | enviado | entregue | cancelado
+  valorTotal      Decimal  @db.Decimal(10, 2)
+  enderecoEntrega String?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  couponId String?
+  coupon   Coupon? @relation(fields: [couponId], references: [id], onDelete: SetNull)
+
+  items         OrderItem[]
+  cartItems     CartItem[]
+  payments      Payment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, statusPedido])
+  @@index([userId])
+  @@index([couponId])
+}
+
+model OrderItem {
+  id                  String  @id @default(cuid())
+  nomeProdutoSnapshot String
+  quantidade          Int
+  precoUnitario       Decimal @db.Decimal(10, 2)
+  subtotal            Decimal @db.Decimal(10, 2)
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Payment {
+  id                    String    @id @default(cuid())
+  valorPago             Decimal   @db.Decimal(10, 2)
+  metodoPagamento       String // cartao | pix | dinheiro | stripe
+  statusPagamento       String    @default("pendente") // pendente | pago | falhou | reembolsado
+  dataPagamento         DateTime?
+  codigoTransacao       String?
+  parcelas              Int       @default(1)
+  stripePaymentIntentId String?   @unique
+
+  appointmentId String?      @unique
+  appointment   Appointment?
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([subscriptionId])
+}
+
+model Coupon {
+  id             String   @id @default(cuid())
+  codigoCupom    String   @unique
+  tipoDesconto   String // percentual | fixo
+  valorDesconto  Decimal  @db.Decimal(10, 2)
+  dataValidade   DateTime
+  quantidadeUsos Int      @default(0)
+  ativo          Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders       Order[]
+  appointments Appointment[]
+}
+
+model Notification {
+  id                String    @id @default(cuid())
+  titulo            String
+  mensagem          String
+  tipoNotificacao   String // confirmacao | lembrete | cobranca | sistema
+  canalEnvio        String // app | email | whatsapp
+  dataEnvio         DateTime?
+  lida              Boolean   @default(false)
+  destinatarioEmail String?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, lida])
+  @@index([userId])
+  @@index([appointmentId])
+  @@index([orderId])
+  @@index([subscriptionId])
+}
+
+model GalleryItem {
+  id             String   @id @default(cuid())
+  titulo         String
+  descricao      String?
+  imagemTrabalho String
+  estiloCorte    String? // fade | classico | barba | combo | outro
+  dataPublicacao DateTime @default(now())
+  destaque       Boolean  @default(false)
+  ordemExibicao  Int      @default(0)
+
+  barberId String?
+  barber   Barber? @relation(fields: [barberId], references: [id], onDelete: SetNull)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([barberId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id                 String   @id @default(cuid())
+  acaoRealizada      String
+  entidadeAfetada    String
+  usuarioResponsavel String
+  dataHoraEvento     DateTime @default(now())
+  detalhesEvento     String?
+  enderecoIp         String?
+  nivelCriticidade   String   @default("info") // info | warning | critical
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([entidadeAfetada, dataHoraEvento])
+  @@index([userId])
+  @@index([appointmentId])
+  @@index([orderId])
+  @@index([subscriptionId])
+}
+
+model Address {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cep         String
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  estado      String
+  principal   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  name      String   @default("")
+  email     String
+  message   String   @default("")
+  createdAt DateTime @default(now())
+}
