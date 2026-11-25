@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { MODELS } from '@/lib/admin-schema';
 import { ownerOrRedirect } from '@/lib/admin-gate';
+import { PACK } from '@/lib/admin-pack';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -72,6 +73,13 @@ export default async function AdminDataIndex() {
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand">Painel do dono</p>
       <h1 className="font-display mt-2 text-3xl font-bold tracking-tight sm:text-5xl">Seu negócio, hoje</h1>
       <p className="mt-3 max-w-2xl text-fg-muted">Veja o que entrou nos últimos dias e cadastre ou edite tudo o que aparece no site e nas telas dos clientes.</p>
+
+      {PACK.agenda && (
+        <Link href="/admin/agenda" className="group mt-8 flex items-center justify-between gap-4 rounded-3xl border border-brand/40 bg-brand/10 p-6 backdrop-blur transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand/10">
+          <div><p className="font-display text-xl font-bold tracking-tight">Agenda do dia</p><p className="mt-1 text-sm text-fg-muted">Veja quem atende quem, a que horas, e confirme ou conclua com um toque.</p></div>
+          <span aria-hidden="true" className="text-2xl text-brand transition group-hover:translate-x-1">→</span>
+        </Link>
+      )}
 
       <div className="mt-10 grid gap-4 lg:grid-cols-3">
         <div className="rounded-3xl border border-border bg-surface/80 p-6 backdrop-blur lg:col-span-2 text-brand">
