@@ -544,7 +544,6 @@ export const MODELS: Record<string, ModelMeta> = {
     "select": {
       "id": true,
       "barberId": true,
-      "userId": true,
       "data": true,
       "horaInicio": true,
       "horaFim": true,
@@ -570,16 +569,6 @@ export const MODELS: Record<string, ModelMeta> = {
         "writable": true,
         "hidden": false,
         "relation": "Barber"
-      },
-      {
-        "name": "userId",
-        "label": "User",
-        "kind": "text",
-        "optional": true,
-        "required": false,
-        "writable": true,
-        "hidden": false,
-        "relation": "User"
       },
       {
         "name": "data",
@@ -616,6 +605,122 @@ export const MODELS: Record<string, ModelMeta> = {
         "required": false,
         "writable": true,
         "hidden": false
+      },
+      {
+        "name": "createdAt",
+        "label": "Created at",
+        "kind": "datetime",
+        "optional": false,
+        "required": false,
+        "writable": false,
+        "hidden": false
+      }
+    ]
+  },
+  "GalleryItem": {
+    "name": "GalleryItem",
+    "delegate": "galleryItem",
+    "label": "Gallery items",
+    "idField": "id",
+    "idKind": "string",
+    "labelField": "titulo",
+    "select": {
+      "id": true,
+      "barberId": true,
+      "titulo": true,
+      "descricao": true,
+      "imagemTrabalho": true,
+      "estiloCorte": true,
+      "dataPublicacao": true,
+      "destaque": true,
+      "ordemExibicao": true,
+      "createdAt": true
+    },
+    "fields": [
+      {
+        "name": "id",
+        "label": "ID",
+        "kind": "text",
+        "optional": false,
+        "required": false,
+        "writable": false,
+        "hidden": true
+      },
+      {
+        "name": "barberId",
+        "label": "Barber",
+        "kind": "text",
+        "optional": false,
+        "required": true,
+        "writable": true,
+        "hidden": false,
+        "relation": "Barber"
+      },
+      {
+        "name": "titulo",
+        "label": "Título",
+        "kind": "text",
+        "optional": false,
+        "required": true,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "descricao",
+        "label": "Descrição",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false,
+        "long": true
+      },
+      {
+        "name": "imagemTrabalho",
+        "label": "Imagem trabalho",
+        "kind": "text",
+        "optional": false,
+        "required": true,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "estiloCorte",
+        "label": "Estilo corte",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "dataPublicacao",
+        "label": "Data publicacao",
+        "kind": "datetime",
+        "optional": false,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "destaque",
+        "label": "Destaque",
+        "kind": "bool",
+        "optional": false,
+        "required": false,
+        "writable": true,
+        "hidden": false,
+        "defaultBool": false
+      },
+      {
+        "name": "ordemExibicao",
+        "label": "Ordem exibicao",
+        "kind": "int",
+        "optional": false,
+        "required": false,
+        "writable": true,
+        "hidden": false,
+        "defaultValue": "0"
       },
       {
         "name": "createdAt",
@@ -694,7 +799,7 @@ export const MODELS: Record<string, ModelMeta> = {
         "required": false,
         "writable": true,
         "hidden": false,
-        "defaultValue": "4"
+        "defaultValue": "0"
       },
       {
         "name": "descontoProdutos",
@@ -773,9 +878,7 @@ export const MODELS: Record<string, ModelMeta> = {
       "statusAssinatura": true,
       "valorMensal": true,
       "stripeSubscriptionId": true,
-      "usosNoCiclo": true,
-      "pausadaEm": true,
-      "canceladaEm": true,
+      "servicosUsadosMes": true,
       "createdAt": true,
       "updatedAt": true
     },
@@ -793,8 +896,8 @@ export const MODELS: Record<string, ModelMeta> = {
         "name": "userId",
         "label": "User",
         "kind": "text",
-        "optional": false,
-        "required": true,
+        "optional": true,
+        "required": false,
         "writable": true,
         "hidden": false,
         "relation": "User"
@@ -883,32 +986,14 @@ export const MODELS: Record<string, ModelMeta> = {
         "hidden": false
       },
       {
-        "name": "usosNoCiclo",
-        "label": "Usos no ciclo",
+        "name": "servicosUsadosMes",
+        "label": "Servicos usados mês",
         "kind": "int",
         "optional": false,
         "required": false,
         "writable": true,
         "hidden": false,
         "defaultValue": "0"
-      },
-      {
-        "name": "pausadaEm",
-        "label": "Pausada em",
-        "kind": "datetime",
-        "optional": true,
-        "required": false,
-        "writable": true,
-        "hidden": false
-      },
-      {
-        "name": "canceladaEm",
-        "label": "Cancelada em",
-        "kind": "datetime",
-        "optional": true,
-        "required": false,
-        "writable": true,
-        "hidden": false
       },
       {
         "name": "createdAt",
@@ -930,6 +1015,90 @@ export const MODELS: Record<string, ModelMeta> = {
       }
     ]
   },
+  "PauseRecord": {
+    "name": "PauseRecord",
+    "delegate": "pauseRecord",
+    "label": "Pause records",
+    "idField": "id",
+    "idKind": "string",
+    "labelField": "subscriptionId",
+    "select": {
+      "id": true,
+      "subscriptionId": true,
+      "userId": true,
+      "dataInicio": true,
+      "dataFim": true,
+      "motivo": true,
+      "createdAt": true
+    },
+    "fields": [
+      {
+        "name": "id",
+        "label": "ID",
+        "kind": "text",
+        "optional": false,
+        "required": false,
+        "writable": false,
+        "hidden": true
+      },
+      {
+        "name": "subscriptionId",
+        "label": "Subscription",
+        "kind": "text",
+        "optional": false,
+        "required": true,
+        "writable": true,
+        "hidden": false,
+        "relation": "Subscription"
+      },
+      {
+        "name": "userId",
+        "label": "User",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false,
+        "relation": "User"
+      },
+      {
+        "name": "dataInicio",
+        "label": "Data início",
+        "kind": "datetime",
+        "optional": false,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "dataFim",
+        "label": "Data fim",
+        "kind": "datetime",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "motivo",
+        "label": "Motivo",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "createdAt",
+        "label": "Created at",
+        "kind": "datetime",
+        "optional": false,
+        "required": false,
+        "writable": false,
+        "hidden": false
+      }
+    ]
+  },
   "Category": {
     "name": "Category",
     "delegate": "category",
@@ -944,8 +1113,7 @@ export const MODELS: Record<string, ModelMeta> = {
       "slug": true,
       "ordemExibicao": true,
       "ativa": true,
-      "createdAt": true,
-      "updatedAt": true
+      "createdAt": true
     },
     "fields": [
       {
@@ -1011,15 +1179,6 @@ export const MODELS: Record<string, ModelMeta> = {
         "kind": "datetime",
         "optional": false,
         "required": false,
-        "writable": false,
-        "hidden": false
-      },
-      {
-        "name": "updatedAt",
-        "label": "Updated at",
-        "kind": "datetime",
-        "optional": false,
-        "required": true,
         "writable": false,
         "hidden": false
       }
@@ -1157,12 +1316,12 @@ export const MODELS: Record<string, ModelMeta> = {
     "label": "Cart items",
     "idField": "id",
     "idKind": "string",
-    "labelField": "userId",
+    "labelField": "productId",
     "select": {
       "id": true,
-      "userId": true,
       "productId": true,
       "orderId": true,
+      "userId": true,
       "quantidade": true,
       "precoUnitario": true,
       "subtotal": true,
@@ -1179,16 +1338,6 @@ export const MODELS: Record<string, ModelMeta> = {
         "required": false,
         "writable": false,
         "hidden": true
-      },
-      {
-        "name": "userId",
-        "label": "User",
-        "kind": "text",
-        "optional": true,
-        "required": false,
-        "writable": true,
-        "hidden": false,
-        "relation": "User"
       },
       {
         "name": "productId",
@@ -1209,6 +1358,16 @@ export const MODELS: Record<string, ModelMeta> = {
         "writable": true,
         "hidden": false,
         "relation": "Order"
+      },
+      {
+        "name": "userId",
+        "label": "User",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false,
+        "relation": "User"
       },
       {
         "name": "quantidade",
@@ -1274,12 +1433,12 @@ export const MODELS: Record<string, ModelMeta> = {
     "label": "Pedidos",
     "idField": "id",
     "idKind": "string",
-    "labelField": "userId",
+    "labelField": "numeroPedido",
     "select": {
       "id": true,
+      "numeroPedido": true,
       "userId": true,
       "couponId": true,
-      "numeroPedido": true,
       "nomeCliente": true,
       "emailCliente": true,
       "telefoneCliente": true,
@@ -1301,6 +1460,15 @@ export const MODELS: Record<string, ModelMeta> = {
         "hidden": true
       },
       {
+        "name": "numeroPedido",
+        "label": "Numero pedido",
+        "kind": "text",
+        "optional": false,
+        "required": true,
+        "writable": true,
+        "hidden": false
+      },
+      {
         "name": "userId",
         "label": "User",
         "kind": "text",
@@ -1319,15 +1487,6 @@ export const MODELS: Record<string, ModelMeta> = {
         "writable": true,
         "hidden": false,
         "relation": "Coupon"
-      },
-      {
-        "name": "numeroPedido",
-        "label": "Numero pedido",
-        "kind": "text",
-        "optional": false,
-        "required": true,
-        "writable": true,
-        "hidden": false
       },
       {
         "name": "nomeCliente",
@@ -1516,8 +1675,7 @@ export const MODELS: Record<string, ModelMeta> = {
       "codigoTransacao": true,
       "parcelas": true,
       "stripeEventId": true,
-      "createdAt": true,
-      "updatedAt": true
+      "createdAt": true
     },
     "fields": [
       {
@@ -1609,10 +1767,11 @@ export const MODELS: Record<string, ModelMeta> = {
         "name": "parcelas",
         "label": "Parcelas",
         "kind": "int",
-        "optional": true,
+        "optional": false,
         "required": false,
         "writable": true,
-        "hidden": false
+        "hidden": false,
+        "defaultValue": "1"
       },
       {
         "name": "stripeEventId",
@@ -1629,15 +1788,6 @@ export const MODELS: Record<string, ModelMeta> = {
         "kind": "datetime",
         "optional": false,
         "required": false,
-        "writable": false,
-        "hidden": false
-      },
-      {
-        "name": "updatedAt",
-        "label": "Updated at",
-        "kind": "datetime",
-        "optional": false,
-        "required": true,
         "writable": false,
         "hidden": false
       }
@@ -1658,8 +1808,7 @@ export const MODELS: Record<string, ModelMeta> = {
       "dataValidade": true,
       "quantidadeUsos": true,
       "ativo": true,
-      "createdAt": true,
-      "updatedAt": true
+      "createdAt": true
     },
     "fields": [
       {
@@ -1734,15 +1883,6 @@ export const MODELS: Record<string, ModelMeta> = {
         "kind": "datetime",
         "optional": false,
         "required": false,
-        "writable": false,
-        "hidden": false
-      },
-      {
-        "name": "updatedAt",
-        "label": "Updated at",
-        "kind": "datetime",
-        "optional": false,
-        "required": true,
         "writable": false,
         "hidden": false
       }
@@ -1898,25 +2038,26 @@ export const MODELS: Record<string, ModelMeta> = {
       }
     ]
   },
-  "GalleryItem": {
-    "name": "GalleryItem",
-    "delegate": "galleryItem",
-    "label": "Gallery items",
+  "BusinessSettings": {
+    "name": "BusinessSettings",
+    "delegate": "businessSettings",
+    "label": "Business settings",
     "idField": "id",
     "idKind": "string",
-    "labelField": "titulo",
+    "labelField": "nomeNegocio",
     "select": {
       "id": true,
-      "barberId": true,
-      "uploadedById": true,
-      "titulo": true,
-      "descricao": true,
-      "imagemTrabalho": true,
-      "estiloCorte": true,
-      "dataPublicacao": true,
-      "destaque": true,
-      "ordemExibicao": true,
-      "createdAt": true,
+      "nomeNegocio": true,
+      "antecedenciaMinimaMin": true,
+      "janelaCancelamentoHrs": true,
+      "horarioAbertura": true,
+      "horarioFechamento": true,
+      "diasFuncionamento": true,
+      "endereco": true,
+      "telefone": true,
+      "whatsapp": true,
+      "emailContato": true,
+      "instagram": true,
       "updatedAt": true
     },
     "fields": [
@@ -1930,98 +2071,108 @@ export const MODELS: Record<string, ModelMeta> = {
         "hidden": true
       },
       {
-        "name": "barberId",
-        "label": "Barber",
+        "name": "nomeNegocio",
+        "label": "Nome negocio",
         "kind": "text",
-        "optional": true,
-        "required": false,
-        "writable": true,
-        "hidden": false,
-        "relation": "Barber"
-      },
-      {
-        "name": "uploadedById",
-        "label": "Uploaded by",
-        "kind": "text",
-        "optional": true,
-        "required": false,
-        "writable": true,
-        "hidden": false,
-        "relation": "User"
-      },
-      {
-        "name": "titulo",
-        "label": "Título",
-        "kind": "text",
-        "optional": false,
-        "required": true,
-        "writable": true,
-        "hidden": false
-      },
-      {
-        "name": "descricao",
-        "label": "Descrição",
-        "kind": "text",
-        "optional": true,
-        "required": false,
-        "writable": true,
-        "hidden": false,
-        "long": true
-      },
-      {
-        "name": "imagemTrabalho",
-        "label": "Imagem trabalho",
-        "kind": "text",
-        "optional": false,
-        "required": true,
-        "writable": true,
-        "hidden": false
-      },
-      {
-        "name": "estiloCorte",
-        "label": "Estilo corte",
-        "kind": "text",
-        "optional": true,
-        "required": false,
-        "writable": true,
-        "hidden": false
-      },
-      {
-        "name": "dataPublicacao",
-        "label": "Data publicacao",
-        "kind": "datetime",
-        "optional": false,
-        "required": false,
-        "writable": true,
-        "hidden": false
-      },
-      {
-        "name": "destaque",
-        "label": "Destaque",
-        "kind": "bool",
         "optional": false,
         "required": false,
         "writable": true,
         "hidden": false,
-        "defaultBool": false
+        "defaultValue": "Navalha & Tinta"
       },
       {
-        "name": "ordemExibicao",
-        "label": "Ordem exibicao",
+        "name": "antecedenciaMinimaMin",
+        "label": "Antecedencia minima min",
         "kind": "int",
         "optional": false,
         "required": false,
         "writable": true,
         "hidden": false,
-        "defaultValue": "0"
+        "defaultValue": "120"
       },
       {
-        "name": "createdAt",
-        "label": "Created at",
-        "kind": "datetime",
+        "name": "janelaCancelamentoHrs",
+        "label": "Janela cancelamento hrs",
+        "kind": "int",
         "optional": false,
         "required": false,
-        "writable": false,
+        "writable": true,
+        "hidden": false,
+        "defaultValue": "12"
+      },
+      {
+        "name": "horarioAbertura",
+        "label": "Horário abertura",
+        "kind": "text",
+        "optional": false,
+        "required": false,
+        "writable": true,
+        "hidden": false,
+        "defaultValue": "09:00"
+      },
+      {
+        "name": "horarioFechamento",
+        "label": "Horário fechamento",
+        "kind": "text",
+        "optional": false,
+        "required": false,
+        "writable": true,
+        "hidden": false,
+        "defaultValue": "20:00"
+      },
+      {
+        "name": "diasFuncionamento",
+        "label": "Dias funcionamento",
+        "kind": "text",
+        "optional": false,
+        "required": false,
+        "writable": true,
+        "hidden": false,
+        "defaultValue": "1,2,3,4,5,6"
+      },
+      {
+        "name": "endereco",
+        "label": "Endereço",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "telefone",
+        "label": "Telefone",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "whatsapp",
+        "label": "Whatsapp",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "emailContato",
+        "label": "Email contato",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
+        "hidden": false
+      },
+      {
+        "name": "instagram",
+        "label": "Instagram",
+        "kind": "text",
+        "optional": true,
+        "required": false,
+        "writable": true,
         "hidden": false
       },
       {
