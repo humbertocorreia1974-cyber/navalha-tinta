@@ -1,4 +1,5 @@
 import { JgnextAssistant } from "@/components/jgnext-assistant";
+import { SiteFooter } from '@/components/site-footer';
 import { PageBackdrop } from '@/components/page-backdrop';
 import { AdminDataPill } from '@/components/admin-data-pill';
 import { Suspense } from 'react';
@@ -16,7 +17,7 @@ const display = Space_Grotesk({ subsets: ["latin"], weight: ["400","700"], varia
 
 export const metadata: Metadata = {
   title: "Navalha & Tinta",
-  description: "Base full-stack: Next.js App Router + NextAuth + Prisma + Stripe.",
+  description: "Barbearia premium com agendamento online por barbeiro, planos de assinatura mensal e identidade clássica e ousada.",
 };
 
 export const viewport = { width: 'device-width', initialScale: 1, maximumScale: 5 };
@@ -31,7 +32,7 @@ export default function RootLayout({
       <body className="min-h-screen font-sans antialiased">
         <PageBackdrop />
         <Suspense fallback={null}><NavProgress /></Suspense>
-        <Providers><AppNav />{children}</Providers>
+        <Providers><AppNav />{children}<SiteFooter /></Providers>
               <JgnextAssistant />
         <CookieConsent />
         <GuidePill />
