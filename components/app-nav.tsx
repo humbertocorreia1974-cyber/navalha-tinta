@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import ASSETS from '@/lib/assets';
 
-const NAV = {"links":[{"href":"/servicos","label":"Serviços"},{"href":"/barbeiros","label":"Barbeiros"},{"href":"/planos","label":"Planos"},{"href":"/galeria","label":"Galeria"},{"href":"/contato","label":"Contato"}],"cta":{"href":"/agendar","label":"Agendar"},"hasLogin":false,"account":"/minha-conta","footer":[{"href":"/termos","label":"Termos de uso"},{"href":"/privacidade","label":"Privacidade"}]};
+const NAV = {"links":[{"href":"/servicos","label":"Serviços"},{"href":"/barbeiros","label":"Barbeiros"},{"href":"/planos","label":"Planos"},{"href":"/galeria","label":"Galeria"},{"href":"/contato","label":"Contato"}],"cta":{"href":"/agendar","label":"Agendar"},"hasLogin":true,"account":"/minha-conta","footer":[{"href":"/termos","label":"Termos de uso"},{"href":"/privacidade","label":"Privacidade"}]};
 const HIDE = [/^\/$/, /^\/login/, /^\/register/, /^\/cadastro/, /^\/redefinir-senha/, /^\/esqueci-senha/, /^\/recuperar/, /^\/verificar/];
 
 export function AppNav() {
