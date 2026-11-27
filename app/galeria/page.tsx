@@ -151,7 +151,7 @@ export default async function GaleriaPage({
           <Card>
             <div className="flex flex-col items-center gap-3 py-12 text-center">
               <h2 className="font-display text-xl text-fg">
-                {filtroAtivo ? 'Nenhum trabalho com esse filtro' : 'Galeria em construção'}
+                {filtroAtivo ? 'Nenhum trabalho com esse filtro' : 'Os primeiros trabalhos chegam em breve'}
               </h2>
               <p className="max-w-md text-sm text-fg-muted">
                 {filtroAtivo

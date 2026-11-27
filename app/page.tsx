@@ -15,7 +15,7 @@ export const metadata = {
   openGraph: { title: M.seoTitle || ASSETS.name, description: M.seoDescription || M.subheadline || '', images: [ASSETS.hero] },
 };
 
-const NAV = [{"href":"/planos","label":"Planos"},{"href":"/servicos","label":"Serviços"},{"href":"/catalogo","label":"Catálogo"},{"href":"/agendar","label":"Agendar"},{"href":"/galeria","label":"Galeria"},{"href":"/contato","label":"Contato"},{"href":"/primeiros-passos","label":"Como usar"}] as { href: string; label: string }[];
+const NAV = [{"href":"/planos","label":"Planos"},{"href":"/servicos","label":"Serviços"},{"href":"/agendar","label":"Agendar"},{"href":"/galeria","label":"Galeria"},{"href":"/contato","label":"Contato"},{"href":"/primeiros-passos","label":"Como usar"}] as { href: string; label: string }[];
 const FOOT = [{"href":"/termos","label":"Termos"},{"href":"/privacidade","label":"Privacidade"},{"href":"/contato","label":"Contato"}] as { href: string; label: string }[];
 const HEAD: string = M.heroHeadline || M.headline || ASSETS.name;
 const SUB: string = M.heroSubheadline || M.subheadline || (ASSETS as any).slogan || '';
