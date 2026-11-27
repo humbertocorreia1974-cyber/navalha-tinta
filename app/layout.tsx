@@ -1,4 +1,5 @@
 import { JgnextAssistant } from "@/components/jgnext-assistant";
+import { A11yPolish } from '@/components/a11y-polish';
 import { SiteFooter } from '@/components/site-footer';
 import { PageBackdrop } from '@/components/page-backdrop';
 import { AdminDataPill } from '@/components/admin-data-pill';
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${body.variable} ${display.variable}`}>
       <body className="min-h-screen font-sans antialiased">
+        <A11yPolish />
         <PageBackdrop />
         <Suspense fallback={null}><NavProgress /></Suspense>
         <Providers><AppNav />{children}<SiteFooter /></Providers>
