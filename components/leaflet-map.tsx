@@ -38,7 +38,7 @@ export default function LeafletMap({
       <MapContainer center={mapCenter} zoom={zoom} scrollWheelZoom style={{ height: '100%', width: '100%' }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="/hero.svg"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {points.filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng)).map((p) => (
           <Marker key={p.id} position={[p.lat, p.lng]} icon={icon}>
